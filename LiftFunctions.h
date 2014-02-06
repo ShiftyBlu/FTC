@@ -1,6 +1,22 @@
 #ifndef LIFT_FUNCTIONS
 #define LIFT_FUNCTIONS
 
+int liftToEncoder(int percent)
+{
+	return(2829 * percent / 400);
+}
+int armToEncoder(int percent)
+{
+	return(450 * percent /400);
+}
+int encoderToLift(int encoder)
+{
+	return(encoder * 400 / 1414);
+}
+int encoderToArm(int encoder)
+{
+	return(encoder * 400 / 900);
+}
 void armBump(int direction)
 {
 	//If direction is a negative value, bump in positive direction.
