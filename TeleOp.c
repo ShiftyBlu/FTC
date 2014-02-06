@@ -54,7 +54,6 @@ void initializeRobot()
 task main()
 {
 	bool tankDrive = false, topHatUp = false, topHatDown = false, speedToggle = false;
-	int direction = 0, driveLift = 0, driveArm = 0;
 	const byte max = 127;
 	float speedMod = 0;
 	//Wait for round to start.
@@ -64,6 +63,7 @@ task main()
 
 	while(true)
 	{
+		//Get input from controllers.
 		getJoystickSettings(joystick);
 		//Default. If driver has chosen tank drive, two joysticks control the drive.
 		if(tankDrive)
@@ -166,39 +166,9 @@ task main()
 		{
 			speedMod = 1;
 		}
-		if(speedToggle)
+		if(toExpo(joystick.joy2_y1) != 0)
 		{
-			//Up/Down motion is sent to driveLift, with speed modifier.
-			driveLift = (toExpo(joystick.joy2_y1)*1.2);
-			//If output is beyond motor input, set to max.
-			if (driveLift > max)
-			{
-				driveLift = max;
-			}
-			//If output is beyond motor -input, set to -max.
-			if (driveLift < -max)
-			{
-				driveLift = -max;
-			}
-			motor[Lift] = driveLift;
-		}
-		//If speed toggle is not on, run normal drive.
-		else
-		{
-			//Up/Down motion is sent to driveLift, with speed modifier.
-			driveLift = (toExpo(joystick.joy2_y1)*speedMod);
-			//If output is beyond motor input, set to max.
-			if (driveLift > max)
-			{
-				driveLift = max;
-			}
-			//If output is beyond motor -input, set to -max.
-			if (driveLift < -max)
-			{
-				driveLift = -max;
-			}
-			motor[Lift] = driveLift;
-			}
+				boostControl(Lift, speedToggle, toExpo(joystick.joy2_y1), speedMod);
 		}
 
 		if(SensorValue(LiftTouchHigh))
@@ -212,62 +182,27 @@ task main()
 
 		if(toExpo(joystick.joy2_y2) != 0)
 		{
-			if(speedToggle)
-			{
-				//In/Out motion is sent to driveArm, with speed modifier.
-				driveArm = (toExpo(joystick.joy2_y2)*1.2);
-				//If output is beyond motor input, set to max.
-				if (driveArm > max)
-				{
-					driveArm = max;
-				}
-				//If output is beyond motor -input, set to -max.
-				if (driveArm < -max)
-				{
-					driveArm = -max;
-				}
-				motor[Arm] = driveArm;
-			}
-			//If speed toggle is not on, run normal drive.
-			else
-			{
-				//In/Out motion is sent to driveArm, with speed modifier.
-				driveArm = (toExpo(joystick.joy2_y2)*speedMod);
-				//If output is beyond motor input, set to max.
-				if (driveArm > max)
-				{
-					driveArm = max;
-				}
-				//If output is beyond motor -input, set to -max.
-				if (driveArm < -max)
-				{
-					driveArm = -max;
-				}
-				motor[Arm] = driveArm;
-				}
-			}
-
-			//If the button is pressed, find the appropriate direction to bump.
-			if (SensorValue(ArmTouch))
-			{
-				armBump(toExpo(joystick.joy2_y2));
-			}
+			boostControl(Arm, speedToggle, toExpo(joystick.joy2_y2), speedMod);
 		}
+
+		//If the button is pressed, find the appropriate direction to bump.
+		if (SensorValue(ArmTouch))
+		{
+				armBump(toExpo(joystick.joy2_y2));
+		}
+		//If button 4 is pressed, set servo position up.
 		if(joy2Btn(4))
 		{
-			//If button 4 is pressed, set servo position up.
 			servo[Scoop] = (180 * 140 / 255);
 		}
-
+		//If button 3 is pressed, set servo position level.
 		if(joy2Btn(3))
 		{
-			//If button 3 is pressed, set servo position level.
 			servo[Scoop] = (180 * 90 / 255);
 		}
-
+		//If button 3 is pressed, set servo position down.
 		if(joy2Btn(2))
 		{
-			//If button 3 is pressed, set servo position down.
 			servo[Scoop] = (180 * 60 / 255);
 	 	}
 	}
