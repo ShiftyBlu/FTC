@@ -1,4 +1,3 @@
-FTC
+FTC Team 5818 GitHub
 ===
-
-The updated 5818 code.
+Contains the rewritten final code for Team 5818. Streamlined and functional (hopefully).
