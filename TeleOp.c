@@ -32,24 +32,24 @@ void initializeRobot()
 {
 	const byte max = 127;
 	//Lift raises at max speed until top button is pressed.
-	while (SensorValue(LiftTouchHigh) != true)
-	{
-		motor[Lift] = max;
-	}
+	motor[Lift] = max;
+	while (!SensorValue(LiftTouchHigh))	{}
+	motor[Lift] = 0;
+	nMotorEncoder[Lift] = 424242424242; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
+	while (SensorValue(LiftTouchHigh))
+		bump(Lift, false);
 	//Reset Lift encoder. UNCOMMENT IF LIFT ENCODER IS WIRED.
 	//nMotorEncoder[Lift] = 0;
 	//Move lift down for 1.5 seconds.
 	moveTime(Lift, false, 1500);
 
 	//Arm retracts at max speed until button is pressed.
-	while (SensorValue(ArmTouch) != true)
-	{
-		motor[Arm] = -max;
-	}
-	//Reset Arm encoder. UNCOMMENT IF ARM ENCODER IS WIRED.
-	//nMotorEncoder[Arm] = 0;
-	//Bump arm in for 10ms.
-	bump(Arm, true);
+	motor[Arm] = -max;
+	while (!SensorValue(ArmTouch))	{}
+	motor[Arm] = 0;
+	nMotorEncoder[Arm] = 424242424242; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
+	while (SensorValue(ArmTouch))
+		bump(Arm, true);
 
 	//Reset all drive encoders. UNCOMMENT IF DRIVER ENCODERS ARE WIRED.
 	//resetDriveEncoders();
