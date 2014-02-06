@@ -47,8 +47,8 @@ void initializeRobot()
 	//Bump arm in for 10ms.
 	bump(Arm, true);
 
-	//Reset all drive encoders.
-	resetDriveEncoders();
+	//Reset all drive encoders. UNCOMMENT IF DRIVER ENCODERS ARE WIRED.
+	//resetDriveEncoders();
 }
 
 task main()
@@ -60,7 +60,6 @@ task main()
 	waitForStart();
 	//Initialize robot function call.
 	initializeRobot();
-
 	while(true)
 	{
 		//Get input from controllers.
@@ -150,7 +149,6 @@ task main()
 				bump(Lift, true);
 			}
 		}
-
 		//If button 7 has been pressed, toggle on increased speed.
 		if(joy2Btn(7))
 		{
@@ -182,18 +180,24 @@ task main()
 		{
 			bump(Lift, true);
 		}
-
 		//If the joystick is in use, run boostControl to manage boosting of speed.
 		if(toExpo(joystick.joy2_y2) != 0)
 		{
 		//boostControl(TYPE, SPEEDTOGGLE, CURRENT JOYSTICK READING, SPEEDMOD);
 			boostControl(Arm, speedToggle,  toExpo(joystick.joy2_y2), speedMod);
 		}
-
-		//If the button is pressed, find the appropriate direction to bump.
+		//If the arm button is pressed, find the appropriate direction to bump.
 		if (SensorValue(ArmTouch))
 		{
 				armBump(toExpo(joystick.joy2_y2));
+		}
+		if((joy1Btn(8))&&!(joy1Btn(7))&&!(controllerInUse()))
+		{
+			turn360('l');
+		}
+		if((joy1Btn(7))&&!(joy1Btn(8))&&!(controllerInUse()))
+		{
+			turn360('r');
 		}
 		//If button 4 is pressed, set servo position up.
 		if(joy2Btn(4))
