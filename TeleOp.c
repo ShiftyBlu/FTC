@@ -156,21 +156,24 @@ task main()
 		{
 			speedToggle = !speedToggle;
 		}
-
+		//If button 8 has been pressed, add temporary increased speed.
 		if(joy2Btn(8))
 		{
 			speedMod = 1.2;
 			speedToggle = false;
 		}
+		//Otherwise, keep speed at the same level.
 		else
 		{
 			speedMod = 1;
 		}
+		//If the joystick is in use, run boostControl to manage boosting of speed.
 		if(toExpo(joystick.joy2_y1) != 0)
 		{
+			//boostControl(TYPE, SPEEDTOGGLE, CURRENT JOYSTICK READING, SPEEDMOD);
 				boostControl(Lift, speedToggle, toExpo(joystick.joy2_y1), speedMod);
 		}
-
+		//If either touch sensor is hit, bump the lift in the appropriate direction.
 		if(SensorValue(LiftTouchHigh))
 		{
 			bump(Lift, false);
@@ -180,9 +183,11 @@ task main()
 			bump(Lift, true);
 		}
 
+		//If the joystick is in use, run boostControl to manage boosting of speed.
 		if(toExpo(joystick.joy2_y2) != 0)
 		{
-			boostControl(Arm, speedToggle, toExpo(joystick.joy2_y2), speedMod);
+		//boostControl(TYPE, SPEEDTOGGLE, CURRENT JOYSTICK READING, SPEEDMOD);
+			boostControl(Arm, speedToggle,  toExpo(joystick.joy2_y2), speedMod);
 		}
 
 		//If the button is pressed, find the appropriate direction to bump.
