@@ -35,7 +35,7 @@ void initializeRobot()
 {
 	const int max = 127;
 	//Set Scoop to full down position.
-	//servo[Scoop] = 0;
+	servo[Scoop] = 0;
 	//Lift raises at max speed until top button is pressed.
 	motor[Lift] = max;
 	while (!SensorValue(LiftTouchHigh)) {}
@@ -233,17 +233,17 @@ task main()
 		//If button 4 is pressed, set servo position up.
 		if(joy2Btn(4))
 		{
-		//	servo[Scoop] = 0;
+			servo[Scoop] = 0;
 		}
 		//If button 3 is pressed, set servo position level.
 		if(joy2Btn(3))
 		{
-		//	servo[Scoop] = 115;
+			servo[Scoop] = 115;
 		}
 		//If button 3 is pressed, set servo position down.
 		if(joy2Btn(2))
 		{
-		//	servo[Scoop] = 180;
+			servo[Scoop] = 180;
 	 	}
 	}
 }
