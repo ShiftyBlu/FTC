@@ -6,12 +6,12 @@
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
-#pragma config(Motor,  mtr_S1_C1_1,     FrontRight,    tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     BackRight,     tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C2_1,     FrontLeft,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     BackLeft,      tmotorTetrix, openLoop, encoder)
-#pragma config(Motor,  mtr_S1_C3_1,     Arm,           tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C3_2,     Lift,          tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     BackLeft,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     FrontLeft,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     FrontRight,    tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_2,     BackRight,     tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C3_1,     Lift,          tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C3_2,     Arm,           tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Servo,  srvo_S1_C4_1,    Scoop,                tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
@@ -29,54 +29,46 @@
 #include "DriveFunctions.h"
 #include "LiftFunctions.h"
 
-///*
-//^^ DELETE IF NO LONGER DEBUGGING.
 void initializeRobot()
 {
-	const int max = 127;
-	//Set Scoop to full down position.
-	//servo[Scoop] = 0;
+	const byte max = 127;
 	//Lift raises at max speed until top button is pressed.
 	motor[Lift] = max;
-	while (!SensorValue(LiftTouchHigh)) {}
+	while (!SensorValue(LiftTouchHigh))	{}
 	motor[Lift] = 0;
 	nMotorEncoder[Lift] = 0; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
-	bump(Lift, false);
-	//Reset Lift encoder.
+	while (SensorValue(LiftTouchHigh))
+		bump(Lift, false);
+	//Reset Lift encoder. UNCOMMENT IF LIFT ENCODER IS WIRED.
 	nMotorEncoder[Lift] = 0;
+	//Move Lift down to center.
+	bump(Lift, false);
 
 	//Arm retracts at max speed until button is pressed.
-	motor[Arm] = max;
+	motor[Arm] = -max;
 	while (!SensorValue(ArmTouch))	{}
 	motor[Arm] = 0;
-	nMotorEncoder[Arm] = 0;
-	wait10Msec(10);
-	motor[Arm] = -80;
-	wait1Msec(1000);
-	motor[Arm] = 0;
+	nMotorEncoder[Arm] = 0; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
+	while (SensorValue(ArmTouch))
+	bump(Arm, true);
 
-
+	//Reset all drive encoders. UNCOMMENT IF DRIVER ENCODERS ARE WIRED.
+	//resetDriveEncoders();
+	//Set Scoop to full down position.
+	servo[Scoop] = 255;
 }
-//vv DELETE IF NO LONGER DEBUGGING.
-//*/
+
 task main()
 {
-
-	motor[Arm] = -80;
-	wait1Msec(500);
-	motor[Arm] = 0;
-	motor[Lift] = -80;
-	wait1Msec(500);
-	motor[Lift] = 0;
-
 	bool tankDrive = false, topHatUp = false, topHatDown = false, speedToggle = false, oldSpeedToggle = false, oldDrive = false;
-	const int max = 127;
+	const byte max = 127;
 	float speedMod = 0;
 	int oldTopHatUp = -1, oldTopHatDown = -1;
-	//Wait for start.
-	waitForStart();
 	//Initialize robot function call.
 	initializeRobot();
+	//Wait for round to start.
+	waitForStart();
+
 	//Autonomous Code Goes Here
 
 	while(true)
@@ -172,11 +164,10 @@ task main()
 			}
 		}
 		//If button 7 has been pressed, toggle on increased speed.
-		if(joy2Btn(7) && !oldSpeedToggle)
+		if(joy2Btn(7))
 		{
 			speedToggle = !speedToggle;
 		}
-		oldSpeedToggle = joy2Btn(7);
 		//If button 8 has been pressed, add temporary increased speed.
 		if(joy2Btn(8))
 		{
@@ -203,10 +194,6 @@ task main()
 		{
 			bump(Lift, true);
 		}
-		if (SensorValue(ArmTouch))
-		{
-			bump(Arm, false);
-		}
 		//If the joystick is in use, run boostControl to manage boosting of speed.
 		int armPos = encoderToArm(nMotorEncoder[Arm]);
 		if(armPos < 98 && armPos > 2)
@@ -218,7 +205,7 @@ task main()
 		{
 			bump(Arm, false);
 		}
-		else if((armPos < 2) || (SensorValue(ArmTouch)))
+		else if(armPos < 2)
 		{
 			bump(Arm, true);
 		}
@@ -233,17 +220,17 @@ task main()
 		//If button 4 is pressed, set servo position up.
 		if(joy2Btn(4))
 		{
-		//	servo[Scoop] = 0;
+			servo[Scoop] = 0;
 		}
 		//If button 3 is pressed, set servo position level.
 		if(joy2Btn(3))
 		{
-		//	servo[Scoop] = 115;
+			servo[Scoop] = 115;
 		}
 		//If button 3 is pressed, set servo position down.
 		if(joy2Btn(2))
 		{
-		//	servo[Scoop] = 180;
+			servo[Scoop] = 180;
 	 	}
 	}
 }

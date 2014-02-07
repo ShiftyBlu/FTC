@@ -8,10 +8,10 @@
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     BackLeft,      tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     FrontLeft,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     FrontRight,    tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C2_2,     BackRight,     tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C3_1,     Arm,           tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C3_2,     Lift,          tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_1,     Lift,          tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_2,     Arm,           tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C3_1,     FrontRight,    tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C3_2,     BackRight,     tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Servo,  srvo_S1_C4_1,    Scoop,                tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
@@ -26,35 +26,28 @@
 void initializeRobot()
 {
 	const byte max = 127;
-	//Lift retracts at max speed until button is pressed.
-	while (!SensorValue(LiftTouchHigh))
-	{
-		motor[Lift] = max;
-	}
+	//Lift raises at max speed until top button is pressed.
+	motor[Lift] = max;
+	while (!SensorValue(LiftTouchHigh))	{}
 	motor[Lift] = 0;
-	//Reset Lift encoder.
-	nMotorEncoder[Lift] = 0;
+	nMotorEncoder[Lift] = 0; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
 	while (SensorValue(LiftTouchHigh))
-	{
-		//Bump Lift down.
 		bump(Lift, false);
-	}
+	//Reset Lift encoder. UNCOMMENT IF LIFT ENCODER IS WIRED.
+	nMotorEncoder[Lift] = 0;
+	//Move Lift down to center.
+	bump(Lift, false);
+
 	//Arm retracts at max speed until button is pressed.
-	if(!SensorValue(ArmTouch))
-	{
-		motor[Arm] = -max;
-	}
-	//Stop Arm motion.
+	motor[Arm] = -max;
+	while (!SensorValue(ArmTouch))	{}
 	motor[Arm] = 0;
-	//Reset Arm encoder.
-	nMotorEncoder[Arm] = 0;
-	if(SensorValue(ArmTouch))
-	{
-		//Bump Arm out.
-		bump(Arm, true);
-	}
-	//Reset all drive encoders.
-	resetDriveEncoders();
+	nMotorEncoder[Arm] = 0; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
+	while (SensorValue(ArmTouch))
+	bump(Arm, true);
+
+	//Reset all drive encoders. UNCOMMENT IF DRIVER ENCODERS ARE WIRED.
+	//resetDriveEncoders();
 	//Set Scoop to full down position.
 	servo[Scoop] = 255;
 }
