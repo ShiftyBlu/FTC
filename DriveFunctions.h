@@ -22,11 +22,11 @@ int toExpo(int& linearInput)
 	}
 	return drive;
 }
-//Bump the motor at +/-80 for 10ms.
-void bump(int type, bool forward)
+//Bump the motor at power for 10ms.
+void bump(int type, int power)
 {
-	motor[type] = forward ? 80 : -80;
-	wait1Msec(10);
+	motor[type] = power;
+	wait1Msec(500);
 	motor[type] = 0;
 }
 //Move the motor at +/-80 for milliseconds ms.

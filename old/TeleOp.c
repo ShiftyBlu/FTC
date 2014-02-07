@@ -31,7 +31,7 @@
 
 void initializeRobot()
 {
-	const byte max = 127;
+	const int max = 127;
 	//Lift raises at max speed until top button is pressed.
 	motor[Lift] = max;
 	while (!SensorValue(LiftTouchHigh))	{}
@@ -61,7 +61,7 @@ void initializeRobot()
 task main()
 {
 	bool tankDrive = false, topHatUp = false, topHatDown = false, speedToggle = false, oldSpeedToggle = false, oldDrive = false;
-	const byte max = 127;
+	const int max = 127;
 	float speedMod = 0;
 	int oldTopHatUp = -1, oldTopHatDown = -1;
 	//Initialize robot function call.

@@ -32,7 +32,7 @@ void armBump(int direction)
 }
 void boostControl(int type, bool speedToggle, int drive, int speedMod)
 {
-	const byte max = 127;
+	const int max = 127;
 	if(speedToggle)
 	{
 		drive = (drive*1.2);

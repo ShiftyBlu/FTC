@@ -17,19 +17,7 @@ int encoderToArm(int encoder)
 {
 	return(encoder * 400 / 900);
 }
-void armBump(int direction)
-{
-	//If direction is a negative value, bump in positive direction.
-	if(direction < 0)
-	{
-		bump(Arm, true);
-	}
-	//If direction is a positive value, bump in negative direction.
-	else if (direction > 0)
-	{
-		bump(Arm, false);
-	}
-}
+
 void boostControl(int type, bool speedToggle, int drive, int speedMod)
 {
 	const int max = 127;

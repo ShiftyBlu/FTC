@@ -3,7 +3,7 @@
 
 int toExpo(int& linearInput)
 {
-	const byte max = 127; //Max motor speeds.
+	const int max = 127; //Max motor speeds.
 	const int deadZone = 7; //Dead zone amount.
 	int drive = pow(1.055, abs(linearInput)) / 7.18 * (linearInput < 0 ? -1 : 1);
 	if (drive < deadZone && drive > -deadZone) //If value is in dead zone, change to 0.

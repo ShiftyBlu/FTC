@@ -6,10 +6,10 @@
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
-#pragma config(Motor,  mtr_S1_C1_1,     FrontRight,    tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     BackRight,     tmotorTetrix, openLoop, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C2_1,     FrontLeft,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     BackLeft,      tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     FrontRight,    tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     BackRight,     tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C2_1,     FrontLeft,     tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C2_2,     BackLeft,      tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C3_1,     Arm,           tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C3_2,     Lift,          tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S1_C4_1,    Scoop,                tServoStandard)
@@ -35,13 +35,16 @@ void initializeRobot()
 {
 	const int max = 127;
 	//Set Scoop to full down position.
-	servo[Scoop] = 0;
+	servo[Scoop] = 255;
 	//Lift raises at max speed until top button is pressed.
 	motor[Lift] = max;
 	while (!SensorValue(LiftTouchHigh)) {}
 	motor[Lift] = 0;
 	nMotorEncoder[Lift] = 0; // THIS VALUE MUST BE THE VALUE OF THE POSITION OF THE TOUCH SENSOR
-	bump(Lift, false);
+	wait1Msec(10);
+	motor[Lift] = -80;
+	wait1Msec(500);
+	motor[Lift] = 0;
 	//Reset Lift encoder.
 	nMotorEncoder[Lift] = 0;
 
@@ -50,12 +53,10 @@ void initializeRobot()
 	while (!SensorValue(ArmTouch))	{}
 	motor[Arm] = 0;
 	nMotorEncoder[Arm] = 0;
-	wait10Msec(10);
+	wait1Msec(10);
 	motor[Arm] = -80;
-	wait1Msec(1000);
+	wait1Msec(500);
 	motor[Arm] = 0;
-
-
 }
 //vv DELETE IF NO LONGER DEBUGGING.
 //*/
@@ -78,9 +79,16 @@ task main()
 	//Initialize robot function call.
 	initializeRobot();
 	//Autonomous Code Goes Here
-
+	servo[Scoop] = 155;
 	while(true)
 	{
+		wait10Msec(5);
+		string EncoderArm = nMotorEncoder[Arm];
+		nxtDisplayString(1, "%s", EncoderArm);
+		wait10Msec(5);
+		string EncoderLift = nMotorEncoder[Lift];
+		nxtDisplayString(2, "%s", EncoderLift);
+		wait10Msec(5);
 		//Get input from controllers.
 		getJoystickSettings(joystick);
 		//Default. If driver has chosen tank drive, two joysticks control the drive.
@@ -190,37 +198,39 @@ task main()
 		}
 		//Check to ensure lift is within operating area.
 		int liftPos = encoderToLift(nMotorEncoder[Lift]);
-		if(liftPos < 98 && liftPos > 2)
-		{
+		//if(liftPos < 98 && liftPos > 2)
+		//{
 			//boostControl(TYPE, SPEEDTOGGLE, CURRENT JOYSTICK READING, SPEEDMOD);
 			boostControl(Lift, speedToggle, toExpo(joystick.joy2_y1), speedMod);
-		}
-		else if(liftPos > 98)
+		//}
+		//else if(liftPos > 98)
+		//{
+			//bump(Lift, false);
+		//}
+		/*else*/ if(SensorValue(LiftTouchHigh))
 		{
-			bump(Lift, false);
+			nMotorEncoder[Lift] = 0;
+			bump(Lift, -127);
 		}
-		else if(liftPos < 2)
+		if (SensorValue(LiftTouchLow))
 		{
-			bump(Lift, true);
-		}
-		if (SensorValue(ArmTouch))
-		{
-			bump(Arm, false);
+			bump(Lift, 127);
 		}
 		//If the joystick is in use, run boostControl to manage boosting of speed.
 		int armPos = encoderToArm(nMotorEncoder[Arm]);
-		if(armPos < 98 && armPos > 2)
-		{
+		//if(armPos < 98 && armPos > 2)
+		//{
 			//boostControl(TYPE, SPEEDTOGGLE, CURRENT JOYSTICK READING, SPEEDMOD);
 			boostControl(Arm, speedToggle, toExpo(joystick.joy2_y2), speedMod);
-		}
-		else if(armPos > 98)
+		//}
+		//else if(armPos > 98)
+		//{
+			//bump(Arm, false);
+		//}
+		/*else*/ if(SensorValue(ArmTouch))
 		{
-			bump(Arm, false);
-		}
-		else if((armPos < 2) || (SensorValue(ArmTouch)))
-		{
-			bump(Arm, true);
+			nMotorEncoder[Arm] = 0;
+			bump(Arm, -127);
 		}
 		if((joy1Btn(8))&&!(joy1Btn(7))&&!(controllerInUse()))
 		{
